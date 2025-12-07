@@ -1,4 +1,5 @@
 import utils
+import sys
 
 
 def split_range(ranges):
@@ -11,22 +12,20 @@ def split_range(ranges):
 
 def invalid_ids_within_range(range_values):
     """Get range of values and get the invalid ones."""
-
-    def split_string_in_half(string_number):
-        """Get 2 strings split in half from the input."""
-        chunk_size = len(string_number) // 2
-        return [
-            string_number[i: i + chunk_size]
-            for i in range(0, len(string_number), chunk_size)
-        ]
-
     invalid_ids = []
     for value in range_values:
-        if len(value) % 2 == 0:
-            two_strings = split_string_in_half(value)
-            if two_strings[0] == two_strings[1]:
+        value_length = len(value)
+        for chunk_size in range(1, value_length):
+            if value_length % chunk_size:
+                continue
+
+            separate_strings = [
+                value[i : i + chunk_size] for i in range(0, value_length, chunk_size)
+            ]
+            if all(chunks == separate_strings[0] for chunks in separate_strings):
                 invalid_ids.append(int(value))
-    return invalid_ids
+
+    return set(invalid_ids)
 
 
 def generate_ids_within_range(range_values):
@@ -39,7 +38,11 @@ def generate_ids_within_range(range_values):
 
 
 if __name__ == "__main__":
-    data = utils.load_single_line_data("real_data/02.txt", ",")
+
+    if sys.argv[-1] == "--test":
+        data = utils.load_single_line_data("first_data/02.txt", ",")
+    else:
+        data = utils.load_single_line_data("real_data/02.txt", ",")
 
     split_ranges = split_range(data)
 
